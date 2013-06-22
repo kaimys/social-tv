@@ -1,0 +1,20 @@
+{
+  "author": "Kai Mysliwiec",
+  "name": "social-media-language",
+  "description": "A second screen social media app",
+  "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:kaimys/social-tv.git"
+  },
+  "engines": {
+    "node": "*"
+  },
+  "dependencies": {
+    "socket.io": "0.9.6",
+    "socket.io-client": "0.9.6",
+    "express": "3.0.0beta4"
+  },
+  "devDependencies": {
+  }
+}

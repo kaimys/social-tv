@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    <title>A second screen social media app</title>
+
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="shortcut icon" href="/img/favicon.ico">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/img/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/img/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/img/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="57x57" href="/img/apple-touch-icon-57-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="/img/apple-touch-icon-precomposed.png">
+
+    <link href="css/jquery-ui.css" rel="stylesheet">
+    <link href="css/ui-lightness-jquery-ui.css" rel="stylesheet">
+
+    <script src="js/jquery-1.7.2.min.js"></script>
+    <script src="js/jquery-ui.min.js"></script>
+    <script src="js/jquery.qrcode.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+
+<style>
+body {
+    background-color: black;
+    font-family: arial,sans-serif;
+    font-size: 18px;
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 100%;
+    vertical-align: middle;
+}
+
+#video {
+    height: 100%;
+    width: 100%;    
+}
+
+#targets {position: absolute; bottom: 30px; left:10px; opacity: 0.7;}
+.drop { float: left; width: 120px; height: 120px; padding: 0; float: left; margin: 5px; border-width: 0px; overflow: hidden;}
+.per {width: 120px;}
+.emo {position: absolute; width: 30px; height: 30px; bottom: 5px; left: 85px;}
+#anne {position: absolute; bottom: 10px; left: 10px;}
+#campino {position: absolute; bottom: 10px; left: 140px;}
+#gregorgysi {position: absolute; bottom: 10px; left: 270px;}
+#lobo {position: absolute; bottom: 10px; left: 400px;}
+</style>
+
+<script>
+$(function() {
+    window.moveTo(0,0);
+    //window.resizeTo((screen.width),(screen.height));
+    window.resizeTo(screen.availWidth,screen.availHeight);
+
+    var socket = io.connect('http://' + document.location.hostname);
+    socket.on('express', function (data) {
+        console.log(data);
+        $('#' + data.target + ' .emo').attr('src', 'emo/' + data.action + '.jpg');
+    });
+    $(document).keydown(function(event) {
+        console.log(event.which);
+        if (event.which == 80) {
+            document.getElementById('video').play();
+            event.preventDefault();
+        }
+    });
+            
+
+});
+</script>
+</head>
+
+<body>
+    <video id="video">
+        <source src="lanz.mp4" type="video/mp4">
+    </video>
+
+      <div id="targets">
+
+        <div id="anne" class="drop">
+            <img class="emo" src="emo/transp.png">
+            <img class="per" src="pic/annewill.jpg">
+        </div>
+
+        <div id="campino" class="drop">
+            <img class="emo" src="emo/transp.png">
+            <img class="per" src="pic/campino.jpg">
+        </div>
+
+        <div id="gregorgysi" class="drop">
+            <img class="emo" src="emo/transp.png">
+            <img class="per" src="pic/gregorgysi.jpg">
+        </div>
+
+        <div id="lobo" class="drop">
+            <img class="emo" src="emo/transp.png">
+            <img class="per" src="pic/lobo.png">
+        </div>
+          
+      </div>
+        
+      </div>
+</body>
+</html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    <title>Social TV</title>
+
+    <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=no;"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="shortcut icon" href="/img/favicon.ico">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/img/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/img/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/img/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="57x57" href="/img/apple-touch-icon-57-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="/img/apple-touch-icon-precomposed.png">
+
+    <link href="css/jquery-ui.css" rel="stylesheet">
+    <link href="css/ui-lightness-jquery-ui.css" rel="stylesheet">
+
+    <script src="js/jquery-1.7.2.min.js"></script>
+    <script src="js/jquery-ui.min.js"></script>
+    <script src="js/jquery.ui.touch-punch.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+
+<style>
+
+#targets { }
+.drop { float: left; width: 60px; height: 60px; padding: 0; float: left; margin: 2px; border-width: 3px; overflow: hidden;}
+.drop img {width: 60px}
+
+#emoticons { margin-top: 30px;}
+.drag { width: 30px; height: 30px; padding: 0.5em; float: left; margin: 2px;  float: left;}
+.drag img {width: 30px;}
+
+#name {width: 200px; heigth: 60px; font-size: 16pt; margin-top: 30px;}
+</style>
+
+<script>
+$(function() {
+    //document.body.addEventListener('touchstart', function(e){ e.preventDefault(); });
+    
+    var socket = io.connect('http://' + document.location.hostname);
+    socket.on('motion', function (data) {
+    });
+    
+    $( ".drag" ).draggable();
+    $( ".drop" ).droppable({
+        drop: function( event, ui ) {
+            $( this )
+                .addClass( "ui-state-highlight" )
+                .find( "p" )
+                .html( "Dropped!" );
+            socket.emit('express', {
+                subject: $('#name').val(),
+                action: ui.draggable.attr('id'),
+                target: $( this ).attr('id')
+            });
+        }
+    });
+});
+</script>
+</head>
+
+<body>
+
+    <div class="container">
+
+      <div id="targets">
+
+        <div id="anne" class="ui-widget-header drop">
+            <img src="pic/annewill.jpg">
+        </div>
+
+        <div id="campino" class="ui-widget-header drop">
+            <img src="pic/campino.jpg">
+        </div>
+
+        <div id="gregorgysi" class="ui-widget-header drop">
+            <img src="pic/gregorgysi.jpg">
+        </div>
+
+        <div id="lobo" class="ui-widget-header drop">
+            <img src="pic/lobo.png">
+        </div>
+          
+      </div>
+        
+      <br clear="all">
+        
+      <div id="emoticons">
+        
+        <div id="cool" class="ui-widget-content drag">
+            <img src="emo/cool.jpg">
+        </div>
+
+        <div id="clown" class="ui-widget-content drag">
+            <img src="emo/clown.jpg">
+        </div>
+
+        <div id="love" class="ui-widget-content drag">
+            <img src="emo/love.jpg">
+        </div>
+
+        <div id="puke" class="ui-widget-content drag">
+            <img src="emo/puke.jpg">
+        </div>
+
+        <div id="sad" class="ui-widget-content drag">
+            <img src="emo/sad.jpg">
+        </div>
+
+        <div id="smile" class="ui-widget-content drag">
+            <img src="emo/smile.jpg">
+        </div>
+
+        <div id="surprise" class="ui-widget-content drag">
+            <img src="emo/surprise.jpg">
+        </div>
+          
+        <br clear="all">
+        
+        <form><input id="name"></form>
+        
+
+      </div>
+    </div>
+  </body>
+</html>
