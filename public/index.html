@@ -63,6 +63,20 @@ body {
 
 #qrcode {position: absolute; bottom: 30px; right:20px;}
 #qrcode img {width: 164px; height: 164px;}
+
+#stats {
+    position: absolute; width: 320px; height: 720px; top: 0; right: 0; 
+    opacity: 0.8; background-color: gray; display: none;
+}
+
+#growl {
+    position: absolute; width: 260px; height: 70px; bottom: 60px; right: 240px; 
+    opacity: 0.8; background-color: gray; border: 3px; border-color: yellow;
+    padding: 4px; display: none;
+    font-size: 16px;
+    font-family: sans-serif;
+    color: yellow;
+}
 </style>
 
 <script>
@@ -93,20 +107,39 @@ $(function() {
     socket.on('express', function (data) {
         console.log(data);
         $('#' + data.target + ' .emo').attr('src', 'emo/' + data.action + '.jpg');
+        $('#growl').html(data.subject + ' ' + data.action + 's on ' +data.target);
+        $('#growl').fadeIn(200, function() {
+            setTimeout(function() {
+                $('#growl').fadeOut(200);
+            }, 4000);
+        });
     });
     
     var playing = false;
+    var show_stats = false;
     $(document).keydown(function(event) {
         console.log(event.which);
-        if (event.which == 80) {
-            if(playing) {
-                document.getElementById('video').play();
-                playing = false;
-            } else {
-                document.getElementById('video').pause();
-                playing = true;
-            }
-            event.preventDefault();
+        switch(event.which) {
+            case 80:
+                if(playing) {
+                    document.getElementById('video').play();
+                    playing = false;
+                } else {
+                    document.getElementById('video').pause();
+                    playing = true;
+                }
+                event.preventDefault();
+                break;
+            case 83:
+                if(show_stats) {
+                    $('#qrcode').fadeOut(500);
+                    $('#stats').fadeIn(500);
+                    show_stats = false;
+                } else {
+                    $('#stats').fadeOut(500);
+                    show_stats = true;
+                }
+                break;
         }
     });
             
@@ -148,8 +181,11 @@ $(function() {
         </div>
           
       </div>
-        
-      <div id="qrcode">
-      </div>
+
+      <div id="growl">Kai pukes on Katrin Sass</div>    
+    
+      <div id="qrcode">&nbsp;</div>
+
+      <div id="stats">&nbsp;</div>
 </body>
 </html>
