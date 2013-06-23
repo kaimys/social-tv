@@ -47,30 +47,31 @@ body {
     width: 100%;    
 }
 
-#targets {position: absolute; bottom: 30px; left:10px; opacity: 0.7;}
+#targets {position: absolute; bottom: 80px; left:10px; opacity: 0.7;}
 .drop {
     float: left; width: 120px; height: 160px; padding: 0; 
     float: left; margin: 5px; border-width: 0px; overflow: hidden;
     border-radius: 80px;
 }
 .per {width: 120px;}
-.emo {position: absolute; width: 30px; height: 30px; bottom: 5px; left: 85px;}
+.emo {position: absolute; height: 50px; bottom: 0px; right: 0px;}
 #markuslanz {position: absolute; bottom: 10px; left: 10px;}
 #katrinsass {position: absolute; bottom: 10px; left: 140px;}
 #peerkusmagk {position: absolute; bottom: 10px; left: 270px;}
 #matthiasmatussek {position: absolute; bottom: 10px; left: 400px;}
 #karldall {position: absolute; bottom: 10px; left: 530px;}
 
-#qrcode {position: absolute; bottom: 30px; right:20px;}
+#qrcode {position: absolute; bottom: 80px; right:20px;}
 #qrcode img {width: 164px; height: 164px;}
 
 #stats {
-    position: absolute; width: 320px; height: 720px; top: 0; right: 0; 
+    position: absolute; width: 530px; height: 800px; top: 0; right: 0; 
     opacity: 0.8; background-color: gray; display: none;
 }
+#stats img {width: 100%; }
 
 #growl {
-    position: absolute; width: 260px; height: 70px; bottom: 60px; right: 240px; 
+    position: absolute; width: 260px; height: 70px; bottom: 110px; right: 240px; 
     opacity: 0.8; background-color: gray; border: 3px; border-color: yellow;
     padding: 4px; display: none;
     font-size: 16px;
@@ -90,6 +91,26 @@ function create_qrcode(text, typeNumber, errorCorrectLevel, table) {
 	return qr.createImgTag();
 };
 
+var emos = {
+        'richtig': '%X unterstützt %Y', 
+        'lol': '%X lacht über %Y', 
+        'luegner': '%X: Das ist doch nicht wahr, %Y!', 
+        'maul-halten': '%X erteilt %Y Redeverbot', 
+        'laber-nicht': '%X: Laber nicht, %Y', 
+        'langweilig': '%X langweilt sich über %Y', 
+        'heul-doch': '%X: Heul doch, %Y!',
+        'fremdschaemen': '%X schämt sich für %Y',
+        'krass': '%X findet %Y krass'
+    };
+
+var people = {
+    "markuslanz": "Markus Lanz",
+    "katrinsass": "Katrin Sass",
+    "peerkusmagk": "Peer Kusmagk",
+    "matthiasmatussek": "Matthias Matussek",
+    "karldall": "Karl Dall"
+};
+
 $(function() {
     window.moveTo(0,0);
     //window.resizeTo((screen.width),(screen.height));
@@ -106,8 +127,11 @@ $(function() {
     var socket = io.connect('http://' + document.location.hostname);
     socket.on('express', function (data) {
         console.log(data);
-        $('#' + data.target + ' .emo').attr('src', 'emo/' + data.action + '.jpg');
-        $('#growl').html(data.subject + ' ' + data.action + 's on ' +data.target);
+        $('#' + data.target + ' .emo').attr('src', 'emo/' + data.action + '.png');
+        var growl = emos[data.action];
+        growl = growl.replace(/%X/, data.subject);
+        growl = growl.replace(/%Y/, people[data.target]);
+        $('#growl').html(growl);
         $('#growl').fadeIn(200, function() {
             setTimeout(function() {
                 $('#growl').fadeOut(200);
@@ -186,6 +210,6 @@ $(function() {
     
       <div id="qrcode">&nbsp;</div>
 
-      <div id="stats">&nbsp;</div>
+      <div id="stats"><img src="img/sidebar.png"></div>
 </body>
 </html>

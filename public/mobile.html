@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
 
-    <title>Social TV Media Language</title>
+    <title>TV Emo Bashing</title>
 
     <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=no;"/>
     <meta name="apple-mobile-web-app-capable" content="yes"/>
@@ -42,35 +42,38 @@ h1 {
 }
 
 #targets { }
-.drop { float: left; width: 72px; height: 96px; padding: 0; float: left; margin: 2px; border-width: 3px; overflow: hidden;}
-.drop img {width: 72px}
+.drop { float: left; width: 60px; height: 80px; padding: 0; float: left; margin: 2px; border-width: 3px; overflow: hidden;}
+.drop img {width: 60px}
 
-#emoticons { position: absolute; top: 260px; }
-.drag { width: 50px; height: 50px; padding: 0; margin: 2px;}
-.drag img {width: 50px;}
+#emoticons { position: absolute; top: 220px;  text-align: center; width: 100%}
+.drag { width: 40px; height: 40px; padding: 0; margin: 2px;}
+.drag img {width: 40px;}
 
+#richtig {position: absolute; left: 30px;  top: 0px;}
+#lol {position: absolute; left: 120px;  top: 0px;}
+#luegner {position: absolute; left: 210px;  top: 0px;}
+#maul-halten {position: absolute; left: 30px;  top: 45px;}
+#laber-nicht {position: absolute; left: 120px;  top: 45px;}
+#langweilig {position: absolute; left: 210px;  top: 45px;}
+#heul-doch {position: absolute; left: 30px;  top: 90px;}
+#fremdschaemen {position: absolute; left: 120px;  top: 90px;}
+#krass {position: absolute; left: 210px;  top: 90px;}
 
-#cool {position: absolute; left: 10px;  top: 0px;}
-#clown {position: absolute; left: 70px;  top: 0px;}
-#love {position: absolute; left: 130px;  top: 0px;}
-#puke {position: absolute; left: 190px;  top: 0px;}
-#sad {position: absolute; left: 10px;  top: 60px;}
-#smile {position: absolute; left: 70px;  top: 60px;}
-#surprise {position: absolute; left: 130px;  top: 60px;}
-
-#input {position: absolute; top: 120px; float: left;}
+#input {position: absolute; top: 150px; float: left;}
 #name {width: 200px; heigth: 60px; font-size: 16pt; }
 </style>
 
 <script>
 var emos = {
-        'cool': [10, 0], 
-        'clown': [70, 0], 
-        'love': [130, 0], 
-        'puke': [190, 0], 
-        'sad': [10, 60], 
-        'smile': [70, 60], 
-        'surprise': [130, 60]
+        'richtig': [30, 0], 
+        'lol': [120, 0], 
+        'luegner': [210, 0], 
+        'maul-halten': [30, 45], 
+        'laber-nicht': [120, 45], 
+        'langweilig': [210, 45], 
+        'heul-doch': [30, 90],
+        'fremdschaemen': [120, 90],
+        'krass': [210, 90]
     };
 $(function() {
     //document.body.addEventListener('touchstart', function(e){ e.preventDefault(); });
@@ -102,7 +105,7 @@ $(function() {
 
 <body>
     
-    <h1>Social TV Media Language</h1>
+    <h1>TV Emo Bashing</h1>
 
     <div class="container">
 
@@ -134,32 +137,40 @@ $(function() {
         
       <div id="emoticons">
         
-          <div id="cool" class="ui-widget-content drag" style="left: 10px;  top: 0px;">
-            <img src="emo/cool.jpg">
+        <div id="richtig" class="ui-widget-content drag">
+            <img src="emo/richtig.png">
         </div>
 
-        <div id="clown" class="ui-widget-content drag">
-            <img src="emo/clown.jpg">
+        <div id="lol" class="ui-widget-content drag">
+            <img src="emo/lol.png">
         </div>
 
-        <div id="love" class="ui-widget-content drag">
-            <img src="emo/love.jpg">
+        <div id="luegner" class="ui-widget-content drag">
+            <img src="emo/luegner.png">
         </div>
 
-        <div id="puke" class="ui-widget-content drag">
-            <img src="emo/puke.jpg">
+        <div id="maul-halten" class="ui-widget-content drag">
+            <img src="emo/maul-halten.png">
         </div>
 
-        <div id="sad" class="ui-widget-content drag">
-            <img src="emo/sad.jpg">
+        <div id="laber-nicht" class="ui-widget-content drag">
+            <img src="emo/laber-nicht.png">
         </div>
 
-        <div id="smile" class="ui-widget-content drag">
-            <img src="emo/smile.jpg">
+        <div id="langweilig" class="ui-widget-content drag">
+            <img src="emo/langweilig.png">
         </div>
 
-        <div id="surprise" class="ui-widget-content drag">
-            <img src="emo/surprise.jpg">
+        <div id="heul-doch" class="ui-widget-content drag">
+            <img src="emo/heul-doch.png">
+        </div>
+          
+        <div id="fremdschaemen" class="ui-widget-content drag">
+            <img src="emo/fremdschaemen.png">
+        </div>
+          
+        <div id="krass" class="ui-widget-content drag">
+            <img src="emo/krass.png">
         </div>
           
         <br clear="all">
