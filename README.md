@@ -2,6 +2,8 @@
 
 A second screen app for live commenting on tv shows. You can comment on persons by moving emoticons onto the show guests. The icons appear on the tv screen including a notification. This was the first prize on the [TV Hackday 2013](http://tvhackday.com/).
 
+[Live demo on YouTube](http://www.youtube.com/watch?v=ze9oq83DFjk)
+
 ![Screen shot](./resources/Screenshot.jpg)
 
 ![The app](./resources/iphone-app.jpg)
@@ -28,4 +30,5 @@ Also thanks to Bertram Gugel, Philipp Sackl, Felix Segebrecht and Csongor Barany
 * Use the **p** key to start the video and **s** to show the fake statistics page
 
 Have fun!
+
 Kai
