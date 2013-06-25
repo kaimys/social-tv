@@ -10,11 +10,11 @@ A second screen app for live commenting on tv shows. You can comment on persons 
 
 ## The Team
 
-* Joan Chirila
-* Susanne Heinz
+* [Joan Chirila](https://twitter.com/betweenmedia)
+* [Susanne Heinz](https://twitter.com/susafari)
 * Anne Lorenz
-* Kai Mysliwiec
-* Jasper Sasse
+* [Kai Mysliwiec](https://twitter.com/kaimys)
+* [Jasper Sasse](https://twitter.com/jaspersasse)
 
 Also thanks to Bertram Gugel, Philipp Sackl, Felix Segebrecht and Csongor Baranyai for the support and the great ideas. And of course the [BLM](http://www.medienpuls-bayern.de/)
 
@@ -31,4 +31,4 @@ Also thanks to Bertram Gugel, Philipp Sackl, Felix Segebrecht and Csongor Barany
 
 Have fun!
 
-Kai
+[Kai](https://twitter.com/kaimys)
