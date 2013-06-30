@@ -22,7 +22,8 @@ app.get('/api/timeline.json', function(req, res) {
     res.end();
 });
 
-var server = app.listen(7777);
+var port = process.env.PORT || 7777,
+    server = app.listen(port);
 io = socket_io.listen(server)
 io.sockets.on('connection', function (socket) {
     console.log("incomming connection");
