@@ -27,8 +27,21 @@
     <script src="js/jquery-1.7.2.min.js"></script>
     <script src="js/jquery-ui.min.js"></script>
     <script src="js/jquery.ui.touch-punch.min.js"></script>
+    <script type="text/javascript" src="js/doT.js"></script>
     <script src="/socket.io/socket.io.js"></script>
 
+    <script id="object_tmpl" type="text/x-dot-template">
+      <div id="{{=it.id}}" class="ui-widget-header drop">
+          <img src="{{=it.img_src}}">
+      </div>
+    </script>
+    
+    <script id="emo_tmpl" type="text/x-dot-template">
+      <div id="{{=it.id}}" class="ui-widget-content drag" style="top: {{=it.top}}; left: {{=it.left}}">
+          <img src="{{=it.img_src}}">
+      </div>
+    </script>
+    
 <style>
 body {
     font-size: 14px;
@@ -46,58 +59,68 @@ h1 {
 .drop img {width: 60px}
 
 #emoticons { position: absolute; top: 220px;  text-align: center; width: 100%}
+#emoticons div { position: absolute; }
 .drag { width: 40px; height: 40px; padding: 0; margin: 2px;}
 .drag img {width: 40px;}
-
-#richtig {position: absolute; left: 30px;  top: 0px;}
-#lol {position: absolute; left: 120px;  top: 0px;}
-#luegner {position: absolute; left: 210px;  top: 0px;}
-#maul-halten {position: absolute; left: 30px;  top: 45px;}
-#laber-nicht {position: absolute; left: 120px;  top: 45px;}
-#langweilig {position: absolute; left: 210px;  top: 45px;}
-#heul-doch {position: absolute; left: 30px;  top: 90px;}
-#fremdschaemen {position: absolute; left: 120px;  top: 90px;}
-#krass {position: absolute; left: 210px;  top: 90px;}
 
 #input {position: absolute; top: 150px; float: left;}
 #name {width: 200px; heigth: 60px; font-size: 16pt; }
 </style>
 
 <script>
-var emos = {
-        'richtig': [30, 0], 
-        'lol': [120, 0], 
-        'luegner': [210, 0], 
-        'maul-halten': [30, 45], 
-        'laber-nicht': [120, 45], 
-        'langweilig': [210, 45], 
-        'heul-doch': [30, 90],
-        'fremdschaemen': [120, 90],
-        'krass': [210, 90]
-    };
 $(function() {
     //document.body.addEventListener('touchstart', function(e){ e.preventDefault(); });
     
     var socket = io.connect('http://' + document.location.hostname);
     socket.on('motion', function (data) {
     });
+
+    var object_tmpl = doT.template($('#object_tmpl').text());
+    var emo_tmpl = doT.template($('#emo_tmpl').text());
     
-    $( ".drag" ).draggable();
-    $( ".drop" ).droppable({
-        drop: function( event, ui ) {
-            console.log(ui.draggable);
-            var emo = ui.draggable.attr('id');
-            $( this ).addClass( "ui-state-highlight" );
-            socket.emit('express', {
-                subject: $('#name').val(),
-                action: emo,
-                target: $( this ).attr('id')
-            });
-            setTimeout(function() {
-                ui.draggable.css('left', emos[emo][0]);
-                ui.draggable.css('top', emos[emo][1]);
-            }, 1000);
+    $.ajax({
+      url: "lanz.json",
+      type: "GET",
+      dataType : "json",
+      success: function( program ) {
+        console.log(program);
+        var obj, html = '', i;
+        
+        for( obj in program.objects) {
+          html += object_tmpl(program.objects[obj]);
         }
+        $('#targets').html(html);
+
+        html = '';
+        i = 0;
+        for( obj in program.actions) {
+          program.actions[obj]['left'] = (30 + (i % 3)*90).toString() + 'px';
+          program.actions[obj]['top'] = (Math.floor(i / 3)*45).toString() + 'px';
+          program.actions[obj]['id'] = obj;
+          html += emo_tmpl(program.actions[obj]);
+          i += 1;
+        }
+        $('#emoticons').html(html);
+        console.log(program);
+        
+        $( ".drag" ).draggable();
+        $( ".drop" ).droppable({
+            drop: function( event, ui ) {
+                console.log(ui.draggable);
+                var emo = ui.draggable.attr('id');
+                $( this ).addClass( "ui-state-highlight" );
+                socket.emit('express', {
+                    subject: $('#name').val(),
+                    action: emo,
+                    target: $( this ).attr('id')
+                });
+                setTimeout(function() {
+                    ui.draggable.css('left', program.actions[emo]['left']);
+                    ui.draggable.css('top', program.actions[emo]['top']);
+                }, 1000);
+            } // drop
+         });
+      } // success
     });
 });
 </script>
@@ -109,76 +132,16 @@ $(function() {
 
     <div class="container">
 
-      <div id="targets">
-
-        <div id="markuslanz" class="ui-widget-header drop">
-            <img src="pic/markuslanz.png">
-        </div>
-
-        <div id="katrinsass" class="ui-widget-header drop">
-            <img src="pic/katrinsass.png">
-        </div>
-
-        <div id="peerkusmagk" class="ui-widget-header drop">
-            <img src="pic/peerkusmagk.png">
-        </div>
-
-        <div id="matthiasmatussek" class="ui-widget-header drop">
-            <img src="pic/matthiasmatussek.png">
-        </div>
-          
-        <div id="karldall" class="ui-widget-header drop">
-            <img src="pic/karldall.png">
-        </div>
-
-      </div>
+      <div id="targets"></div>
         
       <br clear="all">
         
-      <div id="emoticons">
+      <div id="emoticons"></div>
         
-        <div id="richtig" class="ui-widget-content drag">
-            <img src="emo/richtig.png">
-        </div>
-
-        <div id="lol" class="ui-widget-content drag">
-            <img src="emo/lol.png">
-        </div>
-
-        <div id="luegner" class="ui-widget-content drag">
-            <img src="emo/luegner.png">
-        </div>
-
-        <div id="maul-halten" class="ui-widget-content drag">
-            <img src="emo/maul-halten.png">
-        </div>
-
-        <div id="laber-nicht" class="ui-widget-content drag">
-            <img src="emo/laber-nicht.png">
-        </div>
-
-        <div id="langweilig" class="ui-widget-content drag">
-            <img src="emo/langweilig.png">
-        </div>
-
-        <div id="heul-doch" class="ui-widget-content drag">
-            <img src="emo/heul-doch.png">
-        </div>
-          
-        <div id="fremdschaemen" class="ui-widget-content drag">
-            <img src="emo/fremdschaemen.png">
-        </div>
-          
-        <div id="krass" class="ui-widget-content drag">
-            <img src="emo/krass.png">
-        </div>
-          
-        <br clear="all">
+      <br clear="all">
         
-        <div id="input"><form>Name <input id="name"></form></div>
-        
+      <div id="input"><form>Name <input id="name"></form></div>        
 
-      </div>
     </div>
   </body>
 </html>

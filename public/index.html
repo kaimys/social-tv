@@ -26,8 +26,16 @@
     <script src="js/jquery-1.7.2.min.js"></script>
     <script src="js/jquery-ui.min.js"></script>
     <script type="text/javascript" src="js/qrcode2.js"></script>
+    <script type="text/javascript" src="js/doT.js"></script>
     <script src="/socket.io/socket.io.js"></script>
 
+    <script id="object_tmpl" type="text/x-dot-template">
+      <div id="{{=it.id}}" class="drop" style="left: {{=it.left}}">
+          <img class="emo" src="emo/transp.png">
+          <img class="per" src="{{=it.img_src}}">
+      </div>
+    </script>
+    
 <style>
 body {
     background-color: black;
@@ -55,11 +63,8 @@ body {
 }
 .per {width: 120px;}
 .emo {position: absolute; height: 50px; bottom: 0px; right: 0px;}
-#markuslanz {position: absolute; bottom: 10px; left: 40px;}
-#katrinsass {position: absolute; bottom: 10px; left: 170px;}
-#peerkusmagk {position: absolute; bottom: 10px; left: 300px;}
-#matthiasmatussek {position: absolute; bottom: 10px; left: 430px;}
-#karldall {position: absolute; bottom: 10px; left: 560px;}
+
+#targets div {position: absolute; bottom: 10px; }
 
 #qrcode {position: absolute; bottom: 30px; right:50px;}
 #qrcode img {width: 164px; height: 164px;}
@@ -81,34 +86,13 @@ body {
 </style>
 
 <script>
-function create_qrcode(text, typeNumber, errorCorrectLevel, table) {
 
+function create_qrcode(text, typeNumber, errorCorrectLevel, table) {
 	var qr = qrcode(typeNumber || 4, errorCorrectLevel || 'M');
 	qr.addData(text);
 	qr.make();
-
-    //	return qr.createTableTag();
+  //	return qr.createTableTag();
 	return qr.createImgTag();
-};
-
-var emos = {
-        'richtig': '%X unterstützt %Y', 
-        'lol': '%X lacht über %Y', 
-        'luegner': '%X: Das ist doch nicht wahr, %Y!', 
-        'maul-halten': '%X erteilt %Y Redeverbot', 
-        'laber-nicht': '%X: Laber nicht, %Y', 
-        'langweilig': '%X langweilt sich über %Y', 
-        'heul-doch': '%X: Heul doch, %Y!',
-        'fremdschaemen': '%X schämt sich für %Y',
-        'krass': '%X findet %Y krass'
-    };
-
-var people = {
-    "markuslanz": "Markus Lanz",
-    "katrinsass": "Katrin Sass",
-    "peerkusmagk": "Peer Kusmagk",
-    "matthiasmatussek": "Matthias Matussek",
-    "karldall": "Karl Dall"
 };
 
 $(function() {
@@ -116,30 +100,53 @@ $(function() {
     //window.resizeTo((screen.width),(screen.height));
     window.resizeTo(screen.availWidth,screen.availHeight);
     
+    var object_tmpl = doT.template($('#object_tmpl').text());
+    
+    $.ajax({
+      url: "lanz.json",
+      type: "GET",
+      dataType : "json",
+      success: function( program ) {
+        var obj, html = '', i = 0;
+        
+        for( obj in program.objects) {
+          program.objects[obj]['left'] = (40 + i*130).toString() + 'px'; 
+          html += object_tmpl(program.objects[obj]);
+          i += 1;
+        }
+        $('#targets').html(html);
+        
+        $('#video').html('<source src="' + program.video.src + '" type="' + program.video.type + '">');
+        
+        $('#qrcode').html(create_qrcode('http://' + document.location.host + '/mobile.html'));
+        
+        var socket = io.connect('http://' + document.location.hostname);
+        socket.on('express', function (data) {
+            console.log(data);
+            if(data.subject && data.subject !== '') {
+                $('#' + data.target + ' .emo').attr('src', program.actions[data.action].img_src);
+                var growl = program.actions[data.action].sentence;
+                growl = growl.replace(/%X/, data.subject);
+                growl = growl.replace(/%Y/, program.objects[data.target].name);
+                $('#growl').html(growl);
+                $('#growl').fadeIn(200, function() {
+                    setTimeout(function() {
+                        $('#growl').fadeOut(200);
+                    }, 4000);
+                });
+            }
+        });
+        
+      }
+    });
+    
 //    $('#qrcode').qrcode({
 //        width: 128,
 //        height: 128, 
 //        text: 'http://' + document.location.host + '/mobile.html'
 //    });
 
-    $('#qrcode').html(create_qrcode('http://' + document.location.host + '/mobile.html'));
 
-    var socket = io.connect('http://' + document.location.hostname);
-    socket.on('express', function (data) {
-        console.log(data);
-        if(data.subject && data.subject !== '') {
-            $('#' + data.target + ' .emo').attr('src', 'emo/' + data.action + '.png');
-            var growl = emos[data.action];
-            growl = growl.replace(/%X/, data.subject);
-            growl = growl.replace(/%Y/, people[data.target]);
-            $('#growl').html(growl);
-            $('#growl').fadeIn(200, function() {
-                setTimeout(function() {
-                    $('#growl').fadeOut(200);
-                }, 4000);
-            });
-        }
-    });
     
     var playing = false;
     var show_stats = false;
@@ -175,43 +182,14 @@ $(function() {
 </head>
 
 <body>
-    <video id="video">
-        <source src="http://www.eightnine.de/emo-tv/shows/lanz.mp4" type="video/mp4">
-    </video>
+    <video id="video"></video>
 
-      <div id="targets">
+    <div id="targets"></div>
 
-        <div id="markuslanz" class="drop">
-            <img class="emo" src="emo/transp.png">
-            <img class="per" src="pic/markuslanz.png">
-        </div>
+    <div id="growl">&nbsp;</div>    
 
-        <div id="katrinsass" class="drop">
-            <img class="emo" src="emo/transp.png">
-            <img class="per" src="pic/katrinsass.png">
-        </div>
+    <div id="qrcode">&nbsp;</div>
 
-        <div id="peerkusmagk" class="drop">
-            <img class="emo" src="emo/transp.png">
-            <img class="per" src="pic/peerkusmagk.png">
-        </div>
-
-        <div id="matthiasmatussek" class="drop">
-            <img class="emo" src="emo/transp.png">
-            <img class="per" src="pic/matthiasmatussek.png">
-        </div>
-          
-        <div id="karldall" class="drop">
-            <img class="emo" src="emo/transp.png">
-            <img class="per" src="pic/karldall.png">
-        </div>
-          
-      </div>
-
-      <div id="growl">&nbsp;</div>    
-    
-      <div id="qrcode">&nbsp;</div>
-
-      <div id="stats"><img src="img/sidebar.png"></div>
+    <div id="stats"><img src="img/sidebar.png"></div>
 </body>
 </html>

@@ -1,0 +1,76 @@
+{
+  "name": "Markus Lanz",
+  "type": "program",
+  
+  "video": {
+    "src": "http://www.eightnine.de/emo-tv/shows/lanz.mp4",
+    "type": "video/mp4"
+  },
+  
+  "objects": {
+    "markuslanz": {
+      "id": "markuslanz",
+      "name": "Markus Lanz",
+      "img_src": "pic/markuslanz.png"
+    },
+    "katrinsass": {
+      "id": "katrinsass",
+      "name": "Katrin Sass",
+      "img_src": "pic/katrinsass.png"
+    },
+    "peerkusmagk": {
+      "id": "peerkusmagk",
+      "name": "Peer Kusmagk",
+      "img_src": "pic/peerkusmagk.png"
+    },
+    "matthiasmatussek": {
+      "id": "matthiasmatussek",
+      "name": "Matthias Matussek",
+      "img_src": "pic/matthiasmatussek.png"
+    },
+    "karldall": {
+      "id": "karldall",
+      "name": "Karl Dall",
+      "img_src": "pic/karldall.png"
+    }
+  },
+  
+  "actions" : {
+    "right": {
+      "sentence": "%X unterstützt %Y",
+      "img_src": "emo/richtig.png"
+    },
+    "lol": {
+      "sentence": "%X lacht über %Y",
+      "img_src": "emo/lol.png"
+    },
+    "liar": {
+      "sentence": "%X: Das ist doch nicht wahr, %Y!",
+      "img_src": "emo/luegner.png"
+    },
+    "shut_up": {
+      "sentence": "%X erteilt %Y Redeverbot",
+      "img_src": "emo/maul-halten.png"
+    },
+    "stop_babbling": {
+      "sentence": "%X: Laber nicht, %Y",
+      "img_src": "emo/laber-nicht.png"
+    },
+    "boaring": {
+      "sentence": "%X langweilt sich über %Y",
+      "img_src": "emo/langweilig.png"
+    },
+    "go_cry": {
+      "sentence": "%X: Heul doch, %Y!",
+      "img_src": "emo/heul-doch.png"
+    },
+    "be_ashamed_for": {
+      "sentence": "%X schämt sich für %Y",
+      "img_src": "emo/fremdschaemen.png"
+    },
+    "heavy": {
+      "sentence": "%X findet %Y krass",
+      "img_src": "emo/krass.png"
+    }
+  }
+}
