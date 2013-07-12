@@ -22,9 +22,12 @@
 
     <link href="css/jquery-ui.css" rel="stylesheet">
     <link href="css/ui-lightness-jquery-ui.css" rel="stylesheet">
-
+    <link href="css/flipclock.css" rel="stylesheet">
+ 
     <script src="js/jquery-1.7.2.min.js"></script>
     <script src="js/jquery-ui.min.js"></script>
+    <script src="js/prefixfree.min.js"></script><!--needed by flipclock-->
+		<script src="js/flipclock.min.js"></script>
     <script type="text/javascript" src="js/qrcode2.js"></script>
     <script type="text/javascript" src="js/doT.js"></script>
     <script src="/socket.io/socket.io.js"></script>
@@ -55,7 +58,25 @@ body {
     width: 100%;    
 }
 
+#announce {
+  position: absolute; 
+  top: 260px; left:260px;
+  width: 720px; height: 140px;
+  background-color: black;
+  color: white;
+  font-size: 24px;
+}  
+#clock {
+  position: absolute; 
+  top: 300px; left:200px;
+  width: 540px; height: 140px;
+  min-height: 140px;
+  padding: 40px;
+  background-color: black;
+}
+
 #targets {position: absolute; bottom: 30px; left:10px; opacity: 0.7;}
+#targets div {position: absolute; bottom: 10px; }
 .drop {
     float: left; width: 120px; height: 160px; padding: 0; 
     float: left; margin: 5px; border-width: 0px; overflow: hidden;
@@ -63,8 +84,6 @@ body {
 }
 .per {width: 120px;}
 .emo {position: absolute; height: 50px; bottom: 0px; right: 0px;}
-
-#targets div {position: absolute; bottom: 10px; }
 
 #qrcode {position: absolute; bottom: 30px; right:50px;}
 #qrcode img {width: 164px; height: 164px;}
@@ -100,42 +119,63 @@ $(function() {
     //window.resizeTo((screen.width),(screen.height));
     window.resizeTo(screen.availWidth,screen.availHeight);
     
-    var object_tmpl = doT.template($('#object_tmpl').text());
+    var object_tmpl = doT.template($('#object_tmpl').text()),
+        now = new Date();
+    
     
     $.ajax({
-      url: "/api/programm/f9895102043e4d80880121d0e6000b4a",
+      //url: "/api/programm/f9895102043e4d80880121d0e6000b4a",
+      url: "/api/next",
       type: "GET",
       dataType : "json",
-      success: function( program ) {
-        var obj, html = '', i = 0;
+      success: function( res ) {
+        var obj, html = '', i = 0, program = res.rows[0].value,
+            start = new Date(res.rows[0].key),
+            next = start.getTime() - (new Date()).getTime();
+            
+        $('#announce').html('Next show \'' + program.name + '\' starts at ' + start.toLocaleString());
+        var clock = $('#clock').FlipClock({});
+        clock.setTime(next/1000);
+        clock.setCountdown(true);
+        clock.start();
         
-        for( obj in program.objects) {
-          program.objects[obj]['left'] = (40 + i*130).toString() + 'px'; 
-          html += object_tmpl(program.objects[obj]);
-          i += 1;
-        }
-        $('#targets').html(html);
         
-        $('#video').html('<source src="' + program.video.src + '" type="' + program.video.type + '">');
+        setTimeout(function() {
+          clock.stop();
+          $('#clock').fadeOut(200);
+          $('#announce').fadeOut(200);
+          
+          for( obj in program.objects) {
+            program.objects[obj]['left'] = (40 + i*130).toString() + 'px'; 
+            html += object_tmpl(program.objects[obj]);
+            i += 1;
+          }
+          $('#targets').html(html);
+
+          $('#video').html('<source src="' + program.video.src + '" type="' + program.video.type + '">');
+          document.getElementById('video').play();
+          playing = true;
+
+          $('#qrcode').html(create_qrcode('http://' + document.location.host + '/mobile.html'));
+
+          var socket = io.connect('http://' + document.location.hostname);
+          socket.on('express', function (data) {
+              console.log(data);
+              if(data.subject && data.subject !== '') {
+                  $('#' + data.target + ' .emo').attr('src', program.actions[data.action].img_src);
+                  var growl = program.actions[data.action].sentence;
+                  growl = growl.replace(/%X/, data.subject);
+                  growl = growl.replace(/%Y/, program.objects[data.target].name);
+                  $('#growl').html(growl);
+                  $('#growl').fadeIn(200, function() {
+                      setTimeout(function() {
+                          $('#growl').fadeOut(200);
+                      }, 4000);
+                  });
+              }
+          });          
+        }, next);
         
-        $('#qrcode').html(create_qrcode('http://' + document.location.host + '/mobile.html'));
-        
-        var socket = io.connect('http://' + document.location.hostname);
-        socket.on('express', function (data) {
-            console.log(data);
-            if(data.subject && data.subject !== '') {
-                $('#' + data.target + ' .emo').attr('src', program.actions[data.action].img_src);
-                var growl = program.actions[data.action].sentence;
-                growl = growl.replace(/%X/, data.subject);
-                growl = growl.replace(/%Y/, program.objects[data.target].name);
-                $('#growl').html(growl);
-                $('#growl').fadeIn(200, function() {
-                    setTimeout(function() {
-                        $('#growl').fadeOut(200);
-                    }, 4000);
-                });
-            }
-        });
         
       }
     });
@@ -154,12 +194,12 @@ $(function() {
         console.log(event.which);
         switch(event.which) {
             case 80:
-                if(playing) {
+                if(!playing) {
                     document.getElementById('video').play();
-                    playing = false;
+                    playing = true;
                 } else {
                     document.getElementById('video').pause();
-                    playing = true;
+                    playing = false;
                 }
                 event.preventDefault();
                 break;
@@ -189,6 +229,9 @@ $(function() {
     <div id="growl">&nbsp;</div>    
 
     <div id="qrcode">&nbsp;</div>
+    
+    <div id="announce"></div>
+    <div id="clock"></div>
 
     <div id="stats"><img src="img/sidebar.png"></div>
 </body>

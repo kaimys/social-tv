@@ -2,6 +2,7 @@ var express         = require('express'),
     socket_io       = require('socket.io'),
     db              = require('./lib/CouchDB.js'),
     app             = express.createServer(),
+    jsonHeaders     = null,
     timeline        = [],
     votes           = {};
     
@@ -15,24 +16,40 @@ app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 
 //app.param('id', /^[a-z0-9]+$/);
 
+jsonHeaders = {
+  'Content-Type': 'application/json',
+  'CacheControl:': 'private,max=age=0',
+  'Connection:': 'close'
+};
+
 app.get('/api/timeline.json', function(req, res) {
-    res.set({
-        'Content-Type': 'application/json',
-        'CacheControl:': 'private,max=age=0',
-        'Connection:': 'close'
-    });
+    res.set(jsonHeaders);
     res.send(JSON.stringify(timeline));
     res.end();
 });
 
 app.get('/api/programm/:id', function(req, res) {
-    res.set({
-        'Content-Type': 'application/json',
-        'CacheControl:': 'private,max=age=0',
-        'Connection:': 'close'
+    res.set(jsonHeaders);
+    db.getProgramm(req.params.id, function(err, data) {
+      if(err) {
+        res.status(404);
+        res.send(JSON.stringify(err));
+      } else {
+        res.send(JSON.stringify(data));
+      }
+      res.end();
     });
-    db.getProgramm(req.params.id, function(data) {
-      res.send(JSON.stringify(data));
+});
+
+app.get('/api/next', function(req, res) {
+    res.set(jsonHeaders);
+    db.getNextProgramm(function(err, data) {
+      if(err) {
+        res.status(404);
+        res.send(JSON.stringify(err));
+      } else {
+        res.send(JSON.stringify(data));
+      }
       res.end();
     });
 });

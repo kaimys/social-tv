@@ -4,7 +4,15 @@ function(doc) {
     var s = new Date(doc.start).getTime(),
         e = new Date(doc.end).getTime(),
         n = Date.now(), t = s, i;
-    if(doc.repeat === 'daily') {
+
+    if(doc.repeat === 'once') {
+      emit(new Date(s), doc);
+    } else if(doc.repeat === '5minutes') {
+      do {
+        emit(new Date(t), doc);
+        t += 300000;
+      } while(t < e);
+    } else if(doc.repeat === 'daily') {
       do {
         emit(new Date(t), doc);
         t += 86400000;
