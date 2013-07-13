@@ -22,12 +22,9 @@
 
     <link href="css/jquery-ui.css" rel="stylesheet">
     <link href="css/ui-lightness-jquery-ui.css" rel="stylesheet">
-    <link href="css/flipclock.css" rel="stylesheet">
  
     <script src="js/jquery-1.7.2.min.js"></script>
     <script src="js/jquery-ui.min.js"></script>
-    <script src="js/prefixfree.min.js"></script><!--needed by flipclock-->
-		<script src="js/flipclock.min.js"></script>
     <script type="text/javascript" src="js/qrcode2.js"></script>
     <script type="text/javascript" src="js/doT.js"></script>
     <script src="/socket.io/socket.io.js"></script>
@@ -53,6 +50,12 @@ body {
     vertical-align: middle;
 }
 
+#wrapper {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
 #video {
     height: 100%;
     width: 100%;    
@@ -73,6 +76,8 @@ body {
   min-height: 140px;
   padding: 40px;
   background-color: black;
+  color: white;
+  font-size: 96px;
 }
 
 #targets {position: absolute; bottom: 30px; left:10px; opacity: 0.7;}
@@ -114,6 +119,10 @@ function create_qrcode(text, typeNumber, errorCorrectLevel, table) {
 	return qr.createImgTag();
 };
 
+function timef(t) {
+  return (t < 10 ? '0' : '') + Math.floor(t);
+}
+
 $(function() {
     window.moveTo(0,0);
     //window.resizeTo((screen.width),(screen.height));
@@ -131,17 +140,17 @@ $(function() {
       success: function( res ) {
         var obj, html = '', i = 0, program = res.rows[0].value,
             start = new Date(res.rows[0].key),
-            next = start.getTime() - (new Date()).getTime();
+            next = start.getTime() - (new Date()).getTime(),
+            clockIntervall;
             
         $('#announce').html('Next show \'' + program.name + '\' starts at ' + start.toLocaleString());
-        var clock = $('#clock').FlipClock({});
-        clock.setTime(next/1000);
-        clock.setCountdown(true);
-        clock.start();
-        
+        clockIntervall = setInterval(function() {
+          var l = (start.getTime() - (new Date()).getTime()) / 1000;
+          $('#clock').html(timef(l / 3600) + ':' + timef(l % 3600 / 60) + ':' + timef(l % 60));
+        }, 1000);
         
         setTimeout(function() {
-          clock.stop();
+          clearInterval(clockIntervall);
           $('#clock').fadeOut(200);
           $('#announce').fadeOut(200);
           
@@ -222,17 +231,17 @@ $(function() {
 </head>
 
 <body>
-    <video id="video"></video>
+  <video id="video"></video>
 
-    <div id="targets"></div>
+  <div id="targets"></div>
 
-    <div id="growl">&nbsp;</div>    
+  <div id="growl">&nbsp;</div>    
 
-    <div id="qrcode">&nbsp;</div>
-    
-    <div id="announce"></div>
-    <div id="clock"></div>
+  <div id="qrcode">&nbsp;</div>
 
-    <div id="stats"><img src="img/sidebar.png"></div>
+  <div id="announce"></div>
+  <div id="clock"></div>
+
+  <div id="stats"><img src="img/sidebar.png"></div>
 </body>
 </html>

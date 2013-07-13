@@ -4,6 +4,7 @@
   "description": "Katrin Sass beschimpft Peer Kusmagk - Orginal Demo des TV Hackdays",
   "fortmat": "Lanz",
   "original_url": "http://www.youtube.com/watch?v=X311kXUMp9s",
+  "channel": "1",
   "start": "2013-07-12T21:00:00Z",
   "end": "2013-07-13T01:15:00Z",
   "repeat": "5minutes",
@@ -12,7 +13,9 @@
     "type": "video/mp4",
     "length": 182.36,
     "bitrate": 537.73,
-    "size": 12315580
+    "size": 12315580,
+    "width": 640,
+    "height": 360
   },
   "objects": {
     "markuslanz": {
