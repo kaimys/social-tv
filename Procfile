@@ -1,1 +1,1 @@
-web: node socialtv.js
+web: node node/socialtv.js

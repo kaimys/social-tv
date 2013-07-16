@@ -22,8 +22,13 @@ Also thanks to Bertram Gugel, Philipp Sackl, Felix Segebrecht and Csongor Barany
 
 * Install [node.js](http://nodejs.org/download/)
 * Install [GIT](http://git-scm.com/downloads)
+* Install [CouchDB](http://couchdb.apache.org/)
+* Install [CouchApp](http://couchapp.org/page/installing)
 * Clone this repo: git clone git@github.com:kaimys/social-tv.git
-* Change to the new folder: cd social-tv
+* Change to the new folder: cd social-tv/couchapp
+* Create DB: curl -X PUT http://127.0.0.1:5984/emotv
+* Initialize DB with CouchApp: cd couchapp; couchapp push emotv
+* Change to node.js folder: cd ../node
 * Install node.js modules: npm install
 * Start the server: node social-tv.js
 * Enter your ip address of your computer into your browser e.g. http://10.0.0.1:7777/ . Don't use localhost or the qr-code will not work.

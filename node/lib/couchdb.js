@@ -58,7 +58,7 @@ CouchDB.prototype.programmTemplate = function(callback) {
         }
       };
       
-      filename = 'emotv-db/_docs/' + res.uuids[0] + '.json';
+      filename = 'couchapp/_docs/' + res.uuids[0] + '.json';
       fs.writeFile(filename, JSON.stringify(prog, null, 2), function (err) {
         if (err) {
           callback(err);
