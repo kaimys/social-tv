@@ -3,10 +3,10 @@ function(doc) {
   if(doc.type && doc.type === "program") {
     var s = new Date(doc.start).getTime(),
         e = new Date(doc.end).getTime(),
-        n = Date.now(), t = s, i;
+        n = Date.now(), t = s + doc.video.length * 1000, i;
 
     if(doc.repeat === 'once') {
-      emit(new Date(s), doc);
+      emit(new Date(t), doc);
     } else if(doc.repeat === '5minutes') {
       do {
         emit(new Date(t), doc);

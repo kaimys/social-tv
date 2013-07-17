@@ -12,8 +12,16 @@ CouchDB.prototype.getProgramm = function(id, callback) {
   doGet(dbPath + id, callback);
 }
 
-CouchDB.prototype.getNextProgramm = function(callback) {
-  doGet(dbPath + "_design/emotv-db/_view/schedule?startkey=\"" + (new Date()).toISOString() + "\"&limit=1", callback);
+CouchDB.prototype.getCurrentProgramm = function(callback) {
+  doGet(dbPath + "_design/emotv-db/_view/schedule?startkey=\"" + (new Date()).toISOString() + "\"&limit=1", function(err, data) {
+    console.log(data);
+    var ret = {
+      start: (new Date((new Date(data.rows[0].key)).getTime() - data.rows[0].value.video.length * 1000)).toISOString(),
+      end: data.rows[0].key,
+      programm: data.rows[0].value
+    };
+    callback(null, ret);
+  });
 }
 
 CouchDB.prototype.programmTemplate = function(callback) {

@@ -5,7 +5,7 @@
 
     <title>A second screen social media app</title>
 
-    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-capable" content="no"/>
     <meta name="description" content="">
     <meta name="author" content="">
 
@@ -134,22 +134,16 @@ $(function() {
     
     $.ajax({
       //url: "/api/programm/f9895102043e4d80880121d0e6000b4a",
-      url: "/api/next",
+      url: "/api/current",
       type: "GET",
       dataType : "json",
       success: function( res ) {
-        var obj, html = '', i = 0, program = res.rows[0].value,
-            start = new Date(res.rows[0].key),
+        var obj, html = '', i = 0, program = res.programm,
+            start = new Date(res.start),
             next = start.getTime() - (new Date()).getTime(),
             clockIntervall;
-            
-        $('#announce').html('Next show \'' + program.name + '\' starts at ' + start.toLocaleString());
-        clockIntervall = setInterval(function() {
-          var l = (start.getTime() - (new Date()).getTime()) / 1000;
-          $('#clock').html(timef(l / 3600) + ':' + timef(l % 3600 / 60) + ':' + timef(l % 60));
-        }, 1000);
         
-        setTimeout(function() {
+        function startProgramm(at) {
           clearInterval(clockIntervall);
           $('#clock').fadeOut(200);
           $('#announce').fadeOut(200);
@@ -161,7 +155,7 @@ $(function() {
           }
           $('#targets').html(html);
 
-          $('#video').html('<source src="' + program.video.src + '" type="' + program.video.type + '">');
+          $('#video').html('<source src="' + program.video.src + '#t=' + at + '" type="' + program.video.type + '">');
           document.getElementById('video').play();
           playing = true;
 
@@ -183,7 +177,21 @@ $(function() {
                   });
               }
           });          
-        }, next);
+        }
+        
+        if(next > 0) {
+          $('#announce').html('Next show \'' + program.name + '\' starts at ' + start.toLocaleString());
+          clockIntervall = setInterval(function() {
+            var l = (start.getTime() - (new Date()).getTime()) / 1000;
+            $('#clock').html(timef(l / 3600) + ':' + timef(l % 3600 / 60) + ':' + timef(l % 60));
+          }, 1000);
+          setTimeout(function() {
+            startProgramm(0);
+          }, next);
+        } else {
+          startProgramm(-next/1000);
+        }
+        
         
         
       }

@@ -41,9 +41,9 @@ app.get('/api/programm/:id', function(req, res) {
     });
 });
 
-app.get('/api/next', function(req, res) {
+app.get('/api/current', function(req, res) {
     res.set(jsonHeaders);
-    db.getNextProgramm(function(err, data) {
+    db.getCurrentProgramm(function(err, data) {
       if(err) {
         res.status(404);
         res.send(JSON.stringify(err));
