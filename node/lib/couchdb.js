@@ -4,9 +4,7 @@ var  http = require('http'),
      fs = require('fs'),
      dbPath = '/emotv/';
 
-function CouchDB() {
-
-}
+function CouchDB() {}
 
 CouchDB.prototype.getProgramm = function(id, callback) {
   doGet(dbPath + id, callback);
@@ -24,7 +22,7 @@ CouchDB.prototype.getCurrentProgramm = function(callback) {
   });
 }
 
-CouchDB.prototype.programmTemplate = function(callback) {
+CouchDB.prototype.programmTemplate = function(ytvid, callback) {
   doGet('/_uuids', function(err, res) {
     var prog, filename;
     if(err) {
@@ -33,10 +31,10 @@ CouchDB.prototype.programmTemplate = function(callback) {
       prog = {
         "type": "program",
 
-        "name": "Lanz am 29.01.2013",
-        "description": "Katrin Sass beschimpft Peer Kusmagk - Orginal Demo des TV Hackdays",
+        "name": ytvid.title,
+        "description": ytvid.description,
         "fortmat": "Lanz",
-        "original_url": "http://www.youtube.com/watch?v=X311kXUMp9s",
+        "original_url": "http://www.youtube.com/watch?v=" + ytvid.id,
 
         "start": "2013-07-05T20:15:00Z",
         "end": "2013-07-12T20:15:00Z",
@@ -45,7 +43,7 @@ CouchDB.prototype.programmTemplate = function(callback) {
         "video": {
           "src": "http://www.eightnine.de/emo-tv/shows/lanz.mp4",
           "type": "video/mp4",
-          "length": 182.360,
+          "length": ytvid.duration,
           "bitrate": 537.730,
           "size": 12315580
         },
@@ -66,7 +64,7 @@ CouchDB.prototype.programmTemplate = function(callback) {
         }
       };
       
-      filename = 'couchapp/_docs/' + res.uuids[0] + '.json';
+      filename = '../couchapp/_docs/' + res.uuids[0] + '.json';
       fs.writeFile(filename, JSON.stringify(prog, null, 2), function (err) {
         if (err) {
           callback(err);

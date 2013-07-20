@@ -14,7 +14,8 @@
   "dependencies": {
     "socket.io": "0.9.6",
     "socket.io-client": "0.9.6",
-    "express": "3.0.0beta4"
+    "express": "3.0.0beta4",
+    "optimist": "0.6.0"
   },
   "devDependencies": {
   }
