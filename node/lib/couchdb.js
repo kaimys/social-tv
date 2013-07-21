@@ -41,8 +41,9 @@ CouchDB.prototype.programmTemplate = function(ytvid, callback) {
         "repeat": "once",
 
         "video": {
-          "src": "http://www.eightnine.de/emo-tv/shows/lanz.mp4",
           "type": "video/mp4",
+          "src": "http://www.eightnine.de/emo-tv/shows/lanz.mp4",
+          "yt_id": ytvid.id,
           "length": ytvid.duration,
           "bitrate": 537.730,
           "size": 12315580

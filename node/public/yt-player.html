@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title></title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
-    <script src="//ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
+<head>
+  <title>Emo Bashing</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
+  <script type="text/javascript" src="js/qrcode2.js"></script>
+
 <style>
 body {
     position: absolute;
@@ -38,47 +40,68 @@ body {
   bottom: 210px; 
   width: 120px; 
   height: 160px; 
-  opacity: 0.7; padding: 0; 
+  opacity: 0.7;
+  padding: 0; 
   float: left; 
   margin: 5px;
   border-width: 0px;
   overflow: hidden;
   border-radius: 80px;
-  background: url(/pic/karldall.png);
   background-size: 120px 160px;
+}
+
+.spacer {
+  position: relative; 
+  bottom: 210px; 
+  width: 30px; 
+  height: 160px; 
+  opacity: 0;
+  padding: 0; 
+  float: left; 
+  margin: 0;
+  border-width: 0px;
 }
 
 .target img {
   width: 120px; 
 }
 
-</style>
-<script>
-var video,
-    characters = ["annewill.jpg", "campino.jpg", "gregorgysi.jpg", "katrinsass.png", "markuslanz.png", "karldall.png"];
+#qrcode {
+  position: absolute; 
+  bottom: 40px;
+  right:50px;
+}
+#qrcode img {width: 164px; height: 164px;}
 
-$(document).ready(function() {
-  
-  $('#vid_container').width($(window).innerWidth());
-  $('#vid_container').height($(window).innerWidth() / 1.77777777);
-  $('.target').each(function(i) {
-    $(this).css('background', 'url(/pic/' + characters[i] + ')');
-    $(this).css('background-size', '120px 160px');
-  });
-  
+</style>
+
+<script>
+///////////////////////////////////////////////////////////////////////
+// YouTube player handling
+
+var video, onVideoEnd;
+
+// Starts the video and seeks to a given start position.
+
+function startVideo(id, start, callback) {
+  id = "4iZnZYn9prQ"; // test video: uxAV7VpCX5A
   swfobject.embedSWF(
-    "http://www.youtube.com/v/X311kXUMp9s&enablejsapi=1&version=3&controls=0&disablekb=1&showinfo=0",
+    "http://www.youtube.com/v/" + id + "&enablejsapi=1&version=3&autohide=1&controls=0&disablekb=1&showinfo=0&rel=0&start=" + start,
     "video", "100%", "100%", "9", null, null,
-    { allowScriptAccess: "always"}, 
+    { allowScriptAccess: "always"},
     { id: "myytplayer"}
   );
+  onVideoEnd = callback;
+}
 
-});
+// Called by YouTube player after initialization
 
-$(window).resize(function() {
-  $('#vid_container').width($(window).innerWidth());
-  $('#vid_container').height($(window).innerWidth() / 1.77777777);
-});
+function onYouTubePlayerReady(playerId) {
+  console.log('onYouTubePlayerReady');
+  video = $('#myytplayer').get(0);
+  video.addEventListener('onStateChange', 'onStateChange');
+  video.playVideo();
+}
 
 function onStateChange(state) {
     console.log('onVideoPlayerStateChange: ' + state);
@@ -87,31 +110,76 @@ function onStateChange(state) {
         video.playVideo();
         break;
       case 0:
-        //video.destroy();
-        $(video).replaceWith('<div id="video"><img src="img/sendeschluss2.jpg"></div>');
-        brea;
+        video.destroy();
+        onVideoEnd();
+        break;
     }
 }
 
-function onYouTubePlayerReady(playerId) {
-  console.log('onYouTubePlayerReady');
-  video = $('#myytplayer').get(0);
-  video.addEventListener('onStateChange', 'onStateChange');
-  video.playVideo();
+///////////////////////////////////////////////////////////////////////
+// Page setup
+
+var objects = [];
+
+function create_qrcode(text, typeNumber, errorCorrectLevel, table) {
+	var qr = qrcode(typeNumber || 4, errorCorrectLevel || 'M');
+	qr.addData(text);
+	qr.make();
+	return qr.createImgTag();
+};
+
+function resizeVideoContainer() {
+  $('#vid_container').width($(window).innerWidth());
+  $('#vid_container').height($(window).innerWidth() / 1.77777777);
 }
+
+function requestNextVideo() {
+  $.ajax({
+    url: "/api/current",
+    type: "GET",
+    dataType : "json",
+    success: function( res ) {
+      var programm = res.programm, obj, oid;
+      startVideo(programm.video.yt_id, 0, function() {
+        $(video).replaceWith('<div id="video"><img src="img/sendeschluss2.jpg"></div>');
+        objects.forEach(function(each) {
+          each.remove();
+        });
+        setTimeout(function() { requestNextVideo(); }, 5000);
+      });
+      for( oid in programm.objects ) {
+        obj = $('<div class="target"><img class="emo" src="emo/transp.png"></div>');
+        obj.attr('id', programm.objects[oid].id);
+        // TODO Change programm.objects to an array
+        obj.css('background-image', 'url(' + programm.objects[oid].img_src + ')');
+        $('#vid_container').append(obj);
+        objects.push(obj);
+      }
+    }
+  });
+}
+
+$(document).ready(function() {
+  
+  $('#qrcode').html(create_qrcode('http://' + document.location.host + '/mobile.html'));
+  resizeVideoContainer();
+  requestNextVideo();
+
+});
+
+$(window).resize(function() {
+  resizeVideoContainer()
+});
+
 </script>
 
-  </head>
-  <body>
-    <div id="vid_container">
-      <!--video id="video" src="http://www.eightnine.de/emo-tv/shows/lanz.mp4"></video-->
-      <div id="video">You need Flash player 8+ and JavaScript enabled to view this video.</div>
-      <div class="target">&nbsp;</div>
-      <div class="target">&nbsp;</div>
-      <div class="target">&nbsp;</div>
-      <div class="target">&nbsp;</div>
-      <div class="target">&nbsp;</div>
-      <div class="target">&nbsp;</div>
-    </div>
-  </body>
+</head>
+<body>
+  <div id="vid_container">
+    <div id="video">You need Flash player 8+ and JavaScript enabled to view this video.</div>
+    <div id="qrcode">&nbsp;</div>
+    <div class="spacer"></div>
+  </div>
+  
+</body>
 </html>
