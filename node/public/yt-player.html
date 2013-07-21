@@ -9,12 +9,15 @@
 
 <style>
 body {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    overflow: hidden;
-    padding: 0;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  padding: 0;
+  background-color: black;
+  font-family: arial,sans-serif;
+  color: white;
 }
 #vid_container {
   position: absolute; 
@@ -32,7 +35,7 @@ body {
 
 #video img {
   width: 100%;
-  height: 100%
+  height: 100%;
 }
 
 .target {
@@ -63,7 +66,7 @@ body {
 }
 
 .target img {
-  width: 120px; 
+  width: 120px;
 }
 
 #qrcode {
@@ -72,6 +75,20 @@ body {
   right:50px;
 }
 #qrcode img {width: 164px; height: 164px;}
+
+.announce {
+  background-color: black;
+  opacity: 0.8;
+  font-size: 24px;
+  padding: 5px;
+}
+
+#next         { position: absolute; top: 200px; left: 200px; font-size: 36px;}
+#description  { position: absolute; top: 270px; left: 200px; }
+#start        { position: absolute; top: 320px; left: 200px; }
+#clock        { position: absolute; top: 500px; left: 200px; font-size: 96px;}
+#emotv        { position: absolute; top: 40px; right: 40px; background: transparent; padding: 0;}
+#emotv img { height: 96px;}
 
 </style>
 
@@ -84,7 +101,6 @@ var video, onVideoEnd;
 // Starts the video and seeks to a given start position.
 
 function startVideo(id, start, callback) {
-  id = "4iZnZYn9prQ"; // test video: uxAV7VpCX5A
   swfobject.embedSWF(
     "http://www.youtube.com/v/" + id + "&enablejsapi=1&version=3&autohide=1&controls=0&disablekb=1&showinfo=0&rel=0&start=" + start,
     "video", "100%", "100%", "9", null, null,
@@ -111,9 +127,39 @@ function onStateChange(state) {
         break;
       case 0:
         video.destroy();
+        $(video).replaceWith('<div id="video">&nbsp;</div>');
         onVideoEnd();
         break;
     }
+}
+
+///////////////////////////////////////////////////////////////////////
+// Utils
+
+// Get parameters from the query string
+var query_param = new (function (sSearch) {
+  var rNull = /^\s*$/, rBool = /^(true|false)$/i;
+  function buildValue(sValue) {
+    if (rNull.test(sValue)) { return null; }
+    if (rBool.test(sValue)) { return sValue.toLowerCase() === "true"; }
+    if (isFinite(sValue)) { return parseFloat(sValue); }
+    if (isFinite(Date.parse(sValue))) { return new Date(sValue); }
+    return sValue;
+  }
+  if (sSearch.length > 1) {
+    for (var aItKey, nKeyId = 0, aCouples = sSearch.substr(1).split("&"); nKeyId < aCouples.length; nKeyId++) {
+      aItKey = aCouples[nKeyId].split("=");
+      this[unescape(aItKey[0])] = aItKey.length > 1 ? buildValue(unescape(aItKey[1])) : null;
+    }
+  }
+})(window.location.search);
+
+function log(msg) {
+  console.log(msg);
+}
+
+function timef(t) {
+  return (t < 10 ? '0' : '') + Math.floor(t);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -128,9 +174,22 @@ function create_qrcode(text, typeNumber, errorCorrectLevel, table) {
 	return qr.createImgTag();
 };
 
-function resizeVideoContainer() {
-  $('#vid_container').width($(window).innerWidth());
-  $('#vid_container').height($(window).innerWidth() / 1.77777777);
+function startProgramm(programm, start_time) {
+  var obj, oid;
+  startVideo(programm.video.yt_id, start_time, function() {
+    objects.forEach(function(each) {
+      each.remove();
+    });
+    requestNextVideo();
+  });
+  for( oid in programm.objects ) {
+    obj = $('<div class="target"><img class="emo" src="emo/transp.png"></div>');
+    obj.attr('id', programm.objects[oid].id);
+    // TODO Change programm.objects to an array
+    obj.css('background-image', 'url(' + programm.objects[oid].img_src + ')');
+    $('#vid_container').append(obj);
+    objects.push(obj);
+  }
 }
 
 function requestNextVideo() {
@@ -139,25 +198,52 @@ function requestNextVideo() {
     type: "GET",
     dataType : "json",
     success: function( res ) {
-      var programm = res.programm, obj, oid;
-      startVideo(programm.video.yt_id, 0, function() {
-        $(video).replaceWith('<div id="video"><img src="img/sendeschluss2.jpg"></div>');
-        objects.forEach(function(each) {
-          each.remove();
-        });
-        setTimeout(function() { requestNextVideo(); }, 5000);
-      });
-      for( oid in programm.objects ) {
-        obj = $('<div class="target"><img class="emo" src="emo/transp.png"></div>');
-        obj.attr('id', programm.objects[oid].id);
-        // TODO Change programm.objects to an array
-        obj.css('background-image', 'url(' + programm.objects[oid].img_src + ')');
-        $('#vid_container').append(obj);
-        objects.push(obj);
+      if(query_param.debug) {
+        log('Debug mode');
+        // Test video start in 30 seconds
+        res.programm.video.yt_id = "4iZnZYn9prQ"; // test video: uxAV7VpCX5A
+        res.start = (new Date(Math.round((new Date()).getTime() / 30000) * 30000)).toISOString();
+        log(res.start);
       }
+      var programm = res.programm,
+          start = new Date(res.start),
+          next = start.getTime() - (new Date()).getTime(),
+          clockInterval;
+
+      if(next > 0) {
+        // Show banner and countdown for next show
+        $('#video').html('<img src="' +  programm.banner + '">');
+        $('#next').html(programm.name);
+        $('#description').html(programm.description);
+        $('#start').html("Start: " + start.toLocaleString());
+        clockInterval = setInterval(function() {
+          var l = (start.getTime() - (new Date()).getTime()) / 1000;
+          $('#clock').html(timef(l / 3600) + ':' + timef(l % 3600 / 60) + ':' + timef(l % 60));
+        }, 1000);
+        $('.announce').fadeIn(200);
+        // Set timeout for next show
+        setTimeout(function() {
+          clearInterval(clockInterval);
+          $('.announce').fadeOut(200);
+          startProgramm(programm, 0);
+        }, next);
+      } else {
+        startProgramm(programm, -next/1000);
+      }
+
+
     }
   });
 }
+
+function resizeVideoContainer() {
+  $('#vid_container').width($(window).innerWidth());
+  $('#vid_container').height($(window).innerWidth() / 1.77777777);
+}
+
+$(window).resize(function() {
+  resizeVideoContainer()
+});
 
 $(document).ready(function() {
   
@@ -167,19 +253,19 @@ $(document).ready(function() {
 
 });
 
-$(window).resize(function() {
-  resizeVideoContainer()
-});
-
 </script>
 
 </head>
 <body>
   <div id="vid_container">
-    <div id="video">You need Flash player 8+ and JavaScript enabled to view this video.</div>
+    <div id="video">&nbsp;</div>
     <div id="qrcode">&nbsp;</div>
+    <div class="announce" id="next"></div>
+    <div class="announce" id="description"></div>
+    <div class="announce" id="start"></div>
+    <div class="announce" id="clock"></div>
+    <div class="announce" id="emotv"><img src="img/emotv-logo-trans-klein.png"></div>
     <div class="spacer"></div>
   </div>
-  
 </body>
 </html>
