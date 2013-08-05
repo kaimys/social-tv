@@ -83,11 +83,12 @@ $(function() {
     var emo_tmpl = doT.template($('#emo_tmpl').text());
     
     $.ajax({
-      url: "lanz.json",
+      url: "/api/current",
       type: "GET",
       dataType : "json",
-      success: function( program ) {
-        console.log(program);
+      success: function( data ) {
+        console.log(data);
+        program = data.programm;
         var obj, html = '', i;
         
         for( obj in program.objects) {

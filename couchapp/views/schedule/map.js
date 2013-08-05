@@ -1,9 +1,10 @@
 
 function(doc) {
   if(doc.type && doc.type === "program") {
+    /* Emit the end time of the video that can query the video which is currently running. */
     var s = new Date(doc.start).getTime(),
         e = new Date(doc.end).getTime(),
-        n = Date.now(), t = s + doc.video.length * 1000, i;
+        t = s + doc.video.length * 1000;
 
     if(doc.repeat === 'once') {
       emit(new Date(t), doc);

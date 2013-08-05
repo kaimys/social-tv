@@ -1,24 +1,28 @@
 {
   "type": "program",
+
   "name": "Lanz am 29.01.2013",
   "description": "Katrin Sass beschimpft Peer Kusmagk - Orginal Demo des TV Hackdays",
   "fortmat": "Lanz",
-  "original_url": "http://www.youtube.com/watch?v=X311kXUMp9s",
   "banner": "/img/armer_peer.jpg",
+  "original_url": "http://www.youtube.com/watch?v=X311kXUMp9s",
+  
   "channel": "1",
-  "start": "2013-07-17T00:00:00Z",
-  "end": "2013-07-17T03:15:00Z",
+  "start": "2013-08-04T19:00:00Z",
+  "end": "2013-08-05T03:15:00Z",
   "repeat": "5minutes",
+  
   "video": {
     "src": "http://www.eightnine.de/emo-tv/shows/lanz.mp4",
     "yt_id": "X311kXUMp9s",
     "type": "video/mp4",
-    "length": 182.36,
-    "bitrate": 537.73,
+    "length": 182.360,
+    "bitrate": 537.730,
     "size": 12315580,
     "width": 640,
     "height": 360
   },
+  
   "objects": {
     "markuslanz": {
       "id": "markuslanz",

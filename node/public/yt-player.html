@@ -6,6 +6,7 @@
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
   <script src="//ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
   <script type="text/javascript" src="js/qrcode2.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
 
 <style>
 body {
@@ -81,6 +82,16 @@ body {
   opacity: 0.8;
   font-size: 24px;
   padding: 5px;
+}
+
+.growl {
+    position: absolute; 
+    width: 260px; height: 70px; top: 750px; left: 920px;
+    opacity: 0.8; background-color: gray; display: none;
+    padding: 4px;
+    font-size: 16px;
+    font-family: sans-serif;
+    color: yellow;
 }
 
 #next         { position: absolute; top: 200px; left: 200px; font-size: 36px;}
@@ -165,7 +176,7 @@ function timef(t) {
 ///////////////////////////////////////////////////////////////////////
 // Page setup
 
-var objects = [];
+var objects = [], socket;
 
 function create_qrcode(text, typeNumber, errorCorrectLevel, table) {
 	var qr = qrcode(typeNumber || 4, errorCorrectLevel || 'M');
@@ -182,6 +193,7 @@ function startProgramm(programm, start_time) {
     });
     requestNextVideo();
   });
+  // Add the show guests to the screen
   for( oid in programm.objects ) {
     obj = $('<div class="target"><img class="emo" src="emo/transp.png"></div>');
     obj.attr('id', programm.objects[oid].id);
@@ -190,7 +202,26 @@ function startProgramm(programm, start_time) {
     $('#vid_container').append(obj);
     objects.push(obj);
   }
+  // Setup socketio handler
+  socket.on('express', function expressHandler(data) {
+    log(data);
+    // TODO Stack object for grows
+    var growl = programm.actions[data.action].sentence;
+    growl = growl.replace(/%X/, data.subject);
+    growl = growl.replace(/%Y/, programm.objects[data.target].name);
+    growl = $('<div class="growl"> '+ growl + '</div>');
+    $('#vid_container').append(growl);
+    $('.growl').animate({top: '-=80'}, 200, function() {
+      growl.fadeIn(200);
+      setTimeout(function() {
+        growl.fadeOut(200, function() {
+          growl.remove();
+        });
+      }, 8000);
+    });
+  });
 }
+
 
 function requestNextVideo() {
   $.ajax({
@@ -202,7 +233,7 @@ function requestNextVideo() {
         log('Debug mode');
         // Test video start in 30 seconds
         res.programm.video.yt_id = "4iZnZYn9prQ"; // test video: uxAV7VpCX5A
-        res.start = (new Date(Math.round((new Date()).getTime() / 30000) * 30000)).toISOString();
+        res.start = (new Date(Math.round((new Date()).getTime() / 30000) * 30000)).toISOString(); // Start test video every 30 seconds
         log(res.start);
       }
       var programm = res.programm,
@@ -230,8 +261,6 @@ function requestNextVideo() {
       } else {
         startProgramm(programm, -next/1000);
       }
-
-
     }
   });
 }
@@ -250,6 +279,7 @@ $(document).ready(function() {
   $('#qrcode').html(create_qrcode('http://' + document.location.host + '/mobile.html'));
   resizeVideoContainer();
   requestNextVideo();
+  socket = io.connect('http://' + document.location.hostname);
 
 });
 
